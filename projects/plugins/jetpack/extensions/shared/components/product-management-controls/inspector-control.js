@@ -63,6 +63,7 @@ export default function ProductManagementInspectorControl( {
 				interval,
 				type: isMarkedAsDonation ? 'donation' : null,
 				buyer_can_change_amount: isCustomAmount,
+				public: true,
 			},
 			productType,
 			setSelectedProductId,
