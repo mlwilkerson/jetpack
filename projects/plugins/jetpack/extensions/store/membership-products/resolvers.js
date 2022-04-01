@@ -32,7 +32,7 @@ export const getProducts = (
 	const path = addQueryArgs( '/wpcom/v2/memberships/status', {
 		source: origin === 'https://wordpress.com' ? 'gutenberg-wpcom' : 'gutenberg',
 		type: 'all',
-		public: true,
+		is_editable: true,
 	} );
 
 	try {
