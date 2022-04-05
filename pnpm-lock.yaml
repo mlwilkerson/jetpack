@@ -103,6 +103,7 @@ importers:
       '@automattic/jetpack-base-styles': workspace:* || ^0.1
       '@babel/core': 7.17.8
       '@babel/preset-react': 7.16.7
+      '@wordpress/base-styles': 4.3.0
       '@wordpress/browserslist-config': 4.1.2
       '@wordpress/components': 19.7.0
       '@wordpress/date': 4.5.0
@@ -119,6 +120,7 @@ importers:
       react-test-renderer: 17.0.2
     dependencies:
       '@automattic/format-currency': 1.0.0-alpha.0_react@17.0.2
+      '@wordpress/base-styles': 4.3.0
       '@wordpress/browserslist-config': 4.1.2
       '@wordpress/components': 19.7.0_978f344c876a57c1143ffe356b90df31
       '@wordpress/date': 4.5.0
