@@ -1,8 +1,14 @@
 /**
  * External dependencies
  */
-import React from 'react';
+import React, { useState } from 'react';
 import { __, sprintf } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import SimpleNotice from 'components/notice';
+import NoticeAction from 'components/notice/notice-action.jsx';
 
 const CLOSE_TO_LIMIT_PERCENT = 0.8; //TODO: currently 'close' is defined as 80%. This has not been decided/finalised to be the best number here yet
 
@@ -19,6 +25,10 @@ const CLOSE_TO_LIMIT_PERCENT = 0.8; //TODO: currently 'close' is defined as 80%.
  */
 export function NoticeBox( props ) {
 	const notices = [];
+	const [ showNotice, setShowNotice ] = useState( true );
+	const dismissNoticeBox = () => {
+		setShowNotice( false );
+	};
 
 	// check data is valid
 	if ( props.hasValidData === false ) {
@@ -77,18 +87,28 @@ export function NoticeBox( props ) {
 		} );
 	}
 
-	if ( ! notices || notices.length < 1 ) {
+	if ( ! notices || notices.length < 1 || ! showNotice ) {
 		return null;
 	}
 
 	const noticeBoxClassName = notices[ 0 ].isImportant
-		? 'jp-search-notice-box__important'
+		? 'jp-search-notice-box jp-search-notice-box__important'
 		: 'jp-search-notice-box';
 
 	return (
-		<div data-testid="notice-box" className={ noticeBoxClassName }>
-			<p>{ notices[ 0 ].message }</p>
-		</div>
+		<SimpleNotice
+			isCompact={ false }
+			status={ 'is-info' }
+			className={ noticeBoxClassName }
+			onDismissClick={ dismissNoticeBox }
+		>
+			{ notices[ 0 ].message }
+			{ notices[ 0 ].link && (
+				<NoticeAction href={ 'google.com' } external={ false }>
+					{ __( 'I am a link', 'jetpack-search-pkg' ) }
+				</NoticeAction>
+			) }
+		</SimpleNotice>
 	);
 }
 
