@@ -69,6 +69,10 @@ export function NoticeBox( props ) {
 				),
 				props.planRecordLimit
 			),
+			link: {
+				text: __( 'learn more', 'jetpack-search-pkg' ),
+				url: 'https://jetpack.com/support/search/product-pricing/',
+			},
 		} );
 	}
 
@@ -85,6 +89,10 @@ export function NoticeBox( props ) {
 				),
 				props.planRecordLimit
 			),
+			link: {
+				text: __( 'learn more', 'jetpack-search-pkg' ),
+				url: 'https://jetpack.com/support/search/product-pricing/',
+			},
 		} );
 	}
 
@@ -109,8 +117,8 @@ export function NoticeBox( props ) {
 		>
 			{ notices[ 0 ].message }
 			{ notices[ 0 ].link && (
-				<NoticeAction href={ 'google.com' } external={ false }>
-					{ __( 'I am a link', 'jetpack-search-pkg' ) }
+				<NoticeAction href={ notices[ 0 ].link.url } external={ true }>
+					{ notices[ 0 ].link.text }
 				</NoticeAction>
 			) }
 		</SimpleNotice>
