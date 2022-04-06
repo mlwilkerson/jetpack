@@ -28,6 +28,7 @@ export function NoticeBox( props ) {
 	const [ showNotice, setShowNotice ] = useState( true );
 	const dismissNoticeBox = () => {
 		setShowNotice( false );
+		localStorage.setItem( 'dismissedNoticeBox', true );
 	};
 
 	// check data is valid
@@ -94,6 +95,10 @@ export function NoticeBox( props ) {
 	const noticeBoxClassName = notices[ 0 ].isImportant
 		? 'jp-search-notice-box jp-search-notice-box__important'
 		: 'jp-search-notice-box';
+
+	if ( localStorage.getItem( 'dismissedNoticeBox' ) === 'true' ) {
+		return null;
+	}
 
 	return (
 		<SimpleNotice
