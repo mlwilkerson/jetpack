@@ -26,14 +26,34 @@ const CLOSE_TO_LIMIT_PERCENT = 0.8; //TODO: currently 'close' is defined as 80%.
 export function NoticeBox( props ) {
 	const notices = [];
 	const [ showNotice, setShowNotice ] = useState( true );
+
+	// deal with localStorage for ensuring dismissed notice boxs are not re-displayed
+	const dismissedNoticesString = localStorage.getItem( 'dismissedNoticeBoxes' )
+		? localStorage.getItem( 'dismissedNoticeBoxes' )
+		: '';
+
+	const dismissedNoticesArray =
+		dismissedNoticesString.length > 0 ? dismissedNoticesString.split( ',' ) : [];
+
 	const dismissNoticeBox = () => {
 		setShowNotice( false );
-		localStorage.setItem( 'dismissedNoticeBox', true );
+
+		if ( dismissedNoticesString ) {
+			if ( dismissedNoticesArray.includes( notices[ 0 ].id ) ) {
+				localStorage.setItem(
+					'dismissedNoticeBoxes',
+					dismissedNoticesString + ',' + notices[ 0 ].id
+				);
+			}
+		} else {
+			localStorage.setItem( 'dismissedNoticeBoxes', notices[ 0 ].id );
+		}
 	};
 
 	// check data is valid
 	if ( props.hasValidData === false ) {
 		notices.push( {
+			id: 1,
 			message: __(
 				"We weren't able to properly locate your content for Search",
 				'jetpack-search-pkg'
@@ -45,6 +65,7 @@ export function NoticeBox( props ) {
 	// check site has been indexed
 	if ( props.hasBeenIndexed === false ) {
 		notices.push( {
+			id: 2,
 			message: __( 'Your content has not yet been indexed for Search', 'jetpack-search-pkg' ),
 		} );
 	}
@@ -52,6 +73,7 @@ export function NoticeBox( props ) {
 	// check at least one indexable item
 	if ( props.hasItems === false ) {
 		notices.push( {
+			id: 3,
 			message: __(
 				"We weren't able to locate any content for Search to index. Perhaps you don't yet have any posts or pages?",
 				'jetpack-search-pkg'
@@ -61,6 +83,7 @@ export function NoticeBox( props ) {
 
 	if ( props.recordCount > props.planRecordLimit ) {
 		notices.push( {
+			id: 4,
 			message: sprintf(
 				// translators: %d: site's current plan record limit
 				__(
@@ -81,6 +104,7 @@ export function NoticeBox( props ) {
 		props.recordCount < props.planRecordLimit
 	) {
 		notices.push( {
+			id: 5,
 			message: sprintf(
 				// translators: %d: site's current plan record limit
 				__(
@@ -96,6 +120,15 @@ export function NoticeBox( props ) {
 		} );
 	}
 
+	//remove any dismissed notices from notices array
+	for ( const notice in notices ) {
+		const noticeID = notices[ notice ].id;
+
+		if ( dismissedNoticesArray.includes( noticeID.toString() ) ) {
+			notices.splice( notice );
+		}
+	}
+
 	if ( ! notices || notices.length < 1 || ! showNotice ) {
 		return null;
 	}
@@ -103,10 +136,6 @@ export function NoticeBox( props ) {
 	const noticeBoxClassName = notices[ 0 ].isImportant
 		? 'jp-search-notice-box jp-search-notice-box__important'
 		: 'jp-search-notice-box';
-
-	if ( localStorage.getItem( 'dismissedNoticeBox' ) === 'true' ) {
-		return null;
-	}
 
 	return (
 		<SimpleNotice
