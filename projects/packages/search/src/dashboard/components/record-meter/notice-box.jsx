@@ -28,7 +28,7 @@ export function NoticeBox( props ) {
 	const [ showNotice, setShowNotice ] = useState( true );
 
 	// deal with localStorage for ensuring dismissed notice boxs are not re-displayed
-	const dismissedNoticesString = localStorage.getItem( 'dismissedNoticeBoxes' )
+	const dismissedNoticesString = localStorage.getItem( 'dismissedNoticeBoxes' ) ?? '';
 		? localStorage.getItem( 'dismissedNoticeBoxes' )
 		: '';
 
