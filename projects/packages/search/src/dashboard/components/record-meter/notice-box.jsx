@@ -11,6 +11,7 @@ import SimpleNotice from 'components/notice';
 import NoticeAction from 'components/notice/notice-action.jsx';
 
 const CLOSE_TO_LIMIT_PERCENT = 0.8;
+const DISMISSED_NOTICES = 'jetpack-search-dismissed-notices';
 
 const getNotices = ( planRecordLimit = null ) => {
 	return {
@@ -83,9 +84,7 @@ export function NoticeBox( props ) {
 	const [ showNotice, setShowNotice ] = useState( true );
 
 	// deal with localStorage for ensuring dismissed notice boxs are not re-displayed
-	const dismissedNoticesString = localStorage.getItem( 'dismissedNoticeBoxes' ) ?? '';
-		? localStorage.getItem( 'dismissedNoticeBoxes' )
-		: '';
+	const dismissedNoticesString = localStorage.getItem( DISMISSED_NOTICES ) ?? '';
 
 	const dismissedNoticesArray =
 		dismissedNoticesString.length > 0 ? dismissedNoticesString.split( ',' ) : [];
@@ -95,13 +94,10 @@ export function NoticeBox( props ) {
 
 		if ( dismissedNoticesString ) {
 			if ( dismissedNoticesArray.includes( notices[ 0 ].id ) ) {
-				localStorage.setItem(
-					'dismissedNoticeBoxes',
-					dismissedNoticesString + ',' + notices[ 0 ].id
-				);
+				localStorage.setItem( DISMISSED_NOTICES, dismissedNoticesString + ',' + notices[ 0 ].id );
 			}
 		} else {
-			localStorage.setItem( 'dismissedNoticeBoxes', notices[ 0 ].id );
+			localStorage.setItem( DISMISSED_NOTICES, notices[ 0 ].id );
 		}
 	};
 
