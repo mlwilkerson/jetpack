@@ -10,7 +10,61 @@ import { __, sprintf } from '@wordpress/i18n';
 import SimpleNotice from 'components/notice';
 import NoticeAction from 'components/notice/notice-action.jsx';
 
-const CLOSE_TO_LIMIT_PERCENT = 0.8; //TODO: currently 'close' is defined as 80%. This has not been decided/finalised to be the best number here yet
+const CLOSE_TO_LIMIT_PERCENT = 0.8;
+
+const getNotices = ( planRecordLimit = null ) => {
+	return {
+		1: {
+			id: 1,
+			message: __(
+				"We weren't able to properly locate your content for Search",
+				'jetpack-search-pkg'
+			),
+			isImportant: true,
+		},
+		2: {
+			id: 2,
+			message: __( 'Your content has not yet been indexed for Search', 'jetpack-search-pkg' ),
+		},
+		3: {
+			id: 3,
+			message: __(
+				"We weren't able to locate any content for Search to index. Perhaps you don't yet have any posts or pages?",
+				'jetpack-search-pkg'
+			),
+		},
+		4: {
+			id: 4,
+			message: sprintf(
+				// translators: %d: site's current plan record limit
+				__(
+					'You recently surpassed %d records and will be automatically upgraded to the next billing tier',
+					'jetpack-search-pkg'
+				),
+				planRecordLimit
+			),
+			link: {
+				text: __( 'learn more', 'jetpack-search-pkg' ),
+				url: 'https://jetpack.com/support/search/product-pricing/',
+			},
+		},
+		5: {
+			id: 5,
+			message: sprintf(
+				// translators: %d: site's current plan record limit
+				__(
+					"You're close to the max amount of records for this billing tier. Once you hit %d indexed records, you'll automatically be billed for the next tier",
+					'jetpack-search-pkg'
+				),
+				planRecordLimit
+			),
+			link: {
+				text: __( 'learn more', 'jetpack-search-pkg' ),
+				url: 'https://jetpack.com/support/search/product-pricing/',
+			},
+		},
+	};
+};
 
 /**
  * Returns a notice box for displaying notices about record count and plan limits
@@ -24,6 +78,7 @@ const CLOSE_TO_LIMIT_PERCENT = 0.8; //TODO: currently 'close' is defined as 80%.
  * @returns {React.Component} notice box component.
  */
 export function NoticeBox( props ) {
+	const NOTICES = getNotices( props.planRecordLimit );
 	const notices = [];
 	const [ showNotice, setShowNotice ] = useState( true );
 
