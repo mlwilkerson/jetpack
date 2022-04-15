@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * External dependencies
  */
@@ -79,112 +80,54 @@ const getNotices = ( planRecordLimit = null ) => {
  * @returns {React.Component} notice box component.
  */
 export function NoticeBox( props ) {
+	const activeNoticeIds = [];
 	const NOTICES = getNotices( props.planRecordLimit );
-	const notices = [];
+	let notice = activeNoticeIds[ 0 ] ? NOTICES[ activeNoticeIds[ 0 ] ] : [];
 	const [ showNotice, setShowNotice ] = useState( true );
 
 	// deal with localStorage for ensuring dismissed notice boxs are not re-displayed
 	const dismissedNoticesString = localStorage.getItem( DISMISSED_NOTICES ) ?? '';
 
-	const dismissedNoticesArray =
-		dismissedNoticesString.length > 0 ? dismissedNoticesString.split( ',' ) : [];
-
 	const dismissNoticeBox = () => {
 		setShowNotice( false );
-
-		if ( dismissedNoticesString ) {
-			if ( dismissedNoticesArray.includes( notices[ 0 ].id ) ) {
-				localStorage.setItem( DISMISSED_NOTICES, dismissedNoticesString + ',' + notices[ 0 ].id );
-			}
-		} else {
-			localStorage.setItem( DISMISSED_NOTICES, notices[ 0 ].id );
+		if ( ! dismissedNoticesString.includes( notice.id ) ) {
+			localStorage.setItem( DISMISSED_NOTICES, dismissedNoticesString + ',' + notice.id );
 		}
 	};
 
-	// check data is valid
-	if ( props.hasValidData === false ) {
-		notices.push( {
-			id: 1,
-			message: __(
-				"We weren't able to properly locate your content for Search",
-				'jetpack-search-pkg'
-			),
-			isImportant: true,
-		} );
-	}
+	// check if data is valid
+	props.hasValidData === false &&
+		! dismissedNoticesString.includes( '1' ) &&
+		activeNoticeIds.push( '1' );
 
 	// check site has been indexed
-	if ( props.hasBeenIndexed === false ) {
-		notices.push( {
-			id: 2,
-			message: __( 'Your content has not yet been indexed for Search', 'jetpack-search-pkg' ),
-		} );
-	}
+	props.hasBeenIndexed === false &&
+		! dismissedNoticesString.includes( '2' ) &&
+		activeNoticeIds.push( '2' );
 
 	// check at least one indexable item
-	if ( props.hasItems === false ) {
-		notices.push( {
-			id: 3,
-			message: __(
-				"We weren't able to locate any content for Search to index. Perhaps you don't yet have any posts or pages?",
-				'jetpack-search-pkg'
-			),
-		} );
-	}
+	props.hasItems === false &&
+		! dismissedNoticesString.includes( '3' ) &&
+		activeNoticeIds.push( '3' );
 
-	if ( props.recordCount > props.planRecordLimit ) {
-		notices.push( {
-			id: 4,
-			message: sprintf(
-				// translators: %d: site's current plan record limit
-				__(
-					'You recently surpassed %d records and will be automatically upgraded to the next billing tier', //TODO: add a link to the tier pricing/upgrade info page
-					'jetpack-search-pkg'
-				),
-				props.planRecordLimit
-			),
-			link: {
-				text: __( 'learn more', 'jetpack-search-pkg' ),
-				url: 'https://jetpack.com/support/search/product-pricing/',
-			},
-		} );
-	}
+	// check if over limit
+	props.recordCount > props.planRecordLimit &&
+		! dismissedNoticesString.includes( '4' ) &&
+		activeNoticeIds.push( '4' );
 
-	if (
-		props.recordCount > props.planRecordLimit * CLOSE_TO_LIMIT_PERCENT &&
-		props.recordCount < props.planRecordLimit
-	) {
-		notices.push( {
-			id: 5,
-			message: sprintf(
-				// translators: %d: site's current plan record limit
-				__(
-					"You're close to the max amount of records for this billing tier. Once you hit %d indexed records, you'll automatically be billed for the next tier",
-					'jetpack-search-pkg'
-				),
-				props.planRecordLimit
-			),
-			link: {
-				text: __( 'learn more', 'jetpack-search-pkg' ),
-				url: 'https://jetpack.com/support/search/product-pricing/',
-			},
-		} );
-	}
+	// check if close to reaching limit
+	props.recordCount > props.planRecordLimit * CLOSE_TO_LIMIT_PERCENT &&
+		props.recordCount < props.planRecordLimit &&
+		! dismissedNoticesString.includes( '5' ) &&
+		activeNoticeIds.push( '5' );
 
-	//remove any dismissed notices from notices array
-	for ( const notice in notices ) {
-		const noticeID = notices[ notice ].id;
-
-		if ( dismissedNoticesArray.includes( noticeID.toString() ) ) {
-			notices.splice( notice );
-		}
-	}
-
-	if ( ! notices || notices.length < 1 || ! showNotice ) {
+	if ( ! activeNoticeIds || activeNoticeIds.length < 1 || ! showNotice ) {
 		return null;
 	}
 
-	const noticeBoxClassName = notices[ 0 ].isImportant
+	notice = NOTICES[ activeNoticeIds[ 0 ] ];
+
+	const noticeBoxClassName = notice.isImportant
 		? 'jp-search-notice-box jp-search-notice-box__important'
 		: 'jp-search-notice-box';
 
@@ -195,10 +138,10 @@ export function NoticeBox( props ) {
 			className={ noticeBoxClassName }
 			onDismissClick={ dismissNoticeBox }
 		>
-			{ notices[ 0 ].message }
-			{ notices[ 0 ].link && (
-				<NoticeAction href={ notices[ 0 ].link.url } external={ true }>
-					{ notices[ 0 ].link.text }
+			{ notice.message }
+			{ notice.link && (
+				<NoticeAction href={ notice.link.url } external={ true }>
+					{ notice.link.text }
 				</NoticeAction>
 			) }
 		</SimpleNotice>
